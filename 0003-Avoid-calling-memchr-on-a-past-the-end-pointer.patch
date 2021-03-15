@@ -1,0 +1,47 @@
+From fe12839de37b040228fd327e1be22dc8d244c4bb Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Tue, 23 Mar 2021 11:38:07 -0400
+Subject: [PATCH 03/16] Avoid calling memchr() on a past-the-end pointer
+
+This is upstream 165330b7bf0757e30fa8a6de9998a564fb62796f and
+34f28c1492240c0a02b0abb13af7f1870197e41d.
+---
+ lib/header.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/lib/header.c b/lib/header.c
+index 527c93e..697af43 100644
+--- a/lib/header.c
++++ b/lib/header.c
+@@ -417,12 +417,11 @@ unsigned headerSizeof(Header h, int magicp)
+ static inline int strtaglen(const char *str, rpm_count_t c, const char *end)
+ {
+     const char *start = str;
+-    const char *s;
++    const char *s = NULL;
++    int len = -1; /* assume failure */
+ 
+     if (end) {
+-	if (str >= end)
+-	    return -1;
+-	while ((s = memchr(start, '\0', end-start))) {
++	while (end > start && (s = memchr(start, '\0', end-start))) {
+ 	    if (--c == 0 || s > end)
+ 		break;
+ 	    start = s + 1;
+@@ -434,7 +433,11 @@ static inline int strtaglen(const char *str, rpm_count_t c, const char *end)
+ 	    start = s + 1;
+ 	}
+     }
+-    return (c > 0) ? -1 : (s - str + 1);
++
++    if (s != NULL && c == 0)
++	len = s - str + 1;
++
++    return len;
+ }
+ 
+ /**
+-- 
+2.30.2
+

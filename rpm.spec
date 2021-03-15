@@ -73,7 +73,16 @@ Patch906: rpm-4.7.1-geode-i686.patch
 Patch907: rpm-4.13.90-ldflags.patch
 # CVE patch
 Patch909: Fix-CVE-2021-20271-and-CVE-2021-3421.patch
-Patch910: Verify-lengths-in-hdrblobInit.patch
+Patch910: 0001-Verify-lengths-in-hdrblobInit.patch
+Patch911: 0002-Reasonableness-check-on-header-tag-entry-count.patch
+Patch912: 0003-Avoid-calling-memchr-on-a-past-the-end-pointer.patch
+Patch913: 0004-Avoid-integer-overflow-computing-blob-ril.patch
+Patch914: 0005-Avoid-integer-overflow-computing-blob-rdl.patch
+Patch915: 0006-Require-signature-header-to-be-a-contiguous-region.patch
+Patch916: 0007-Add-assertions-for-out-of-bounds-errors.patch
+Patch917: 0008-Require-tag-data-entries-in-packages-to-be-sorted.patch
+Patch918: 0009-Reject-RPMv3-packages.patch
+Patch919: 0010-Force-GCC-to-behave-as-RPM-expects.patch
 
 # Partially GPL/LGPL dual-licensed and some bits with BSD
 # SourceLicense: (GPLv2+ and LGPLv2+ with exceptions) and BSD 

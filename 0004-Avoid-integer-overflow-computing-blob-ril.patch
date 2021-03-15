@@ -1,0 +1,41 @@
+From 10c92b935ee82f90c620ccc179a12eee42cabc1e Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Tue, 23 Mar 2021 11:42:19 -0400
+Subject: [PATCH 04/16] Avoid integer overflow computing blob->ril
+
+This is upstream c3e04c2ac91737b06ce5592e8cd8558498e566c0 and
+1efe530450b5bdbd90128327be56c87fa1b6843b.
+---
+ lib/header.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/lib/header.c b/lib/header.c
+index 697af43..0a6f08b 100644
+--- a/lib/header.c
++++ b/lib/header.c
+@@ -1852,8 +1852,6 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
+     blob->rdl = regionEnd - blob->dataStart;
+ 
+     ei2h(&trailer, &einfo);
+-    /* Trailer offset is negative and has a special meaning */
+-    einfo.offset = -einfo.offset;
+     if (!(einfo.tag == regionTag &&
+ 	  einfo.type == REGION_TAG_TYPE && einfo.count == REGION_TAG_COUNT))
+     {
+@@ -1863,8 +1861,12 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
+ 	goto exit;
+     }
+ 
++    /*
++     * Trailer offset is negative and has a special meaning.  Negate *after*
++     * division to prevent overflow.  Watch out for precedence!
++     */
++    blob->ril = -(einfo.offset/sizeof(*blob->pe));
+     /* Does the region actually fit within the header? */
+-    blob->ril = einfo.offset/sizeof(*blob->pe);
+     if ((einfo.offset % sizeof(*blob->pe)) || hdrchkRange(blob->il, blob->ril) ||
+ 					hdrchkRange(blob->dl, blob->rdl)) {
+ 	rasprintf(buf, _("region %d size: BAD, ril %d il %d rdl %d dl %d"),
+-- 
+2.30.2
+

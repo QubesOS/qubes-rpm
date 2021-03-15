@@ -1,0 +1,45 @@
+From 98ccde1ad46c57c0ec089c63e99d2a58eca1d522 Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Tue, 23 Mar 2021 11:50:11 -0400
+Subject: [PATCH 07/16] Add assertions for out-of-bounds errors
+
+If we wind up in dataLength() with an invalid data type, we could access
+a global variable out of bounds.  Crash instead.
+---
+ lib/header.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/lib/header.c b/lib/header.c
+index 2b14b42..a1fbba8 100644
+--- a/lib/header.c
++++ b/lib/header.c
+@@ -9,6 +9,8 @@
+ /* network byte order and is converted on the fly to host order. */
+ 
+ #include "system.h"
++#include <stdlib.h>
++#include <assert.h>
+ #include <netdb.h>
+ #include <errno.h>
+ #include <inttypes.h>
+@@ -456,6 +458,8 @@ static int dataLength(rpm_tagtype_t type, rpm_constdata_t p, rpm_count_t count,
+     const char * se = pend;
+     int length = 0;
+ 
++    assert(!hdrchkType(type));
++
+     switch (type) {
+     case RPM_STRING_TYPE:
+ 	if (count != 1)
+@@ -2057,6 +2061,8 @@ rpmRC hdrblobGet(hdrblob blob, uint32_t tag, rpmtd td)
+ 	entry.data = blob->dataStart + einfo.offset;
+ 	entry.length = dataLength(einfo.type, blob->dataStart + einfo.offset,
+ 			 einfo.count, 1, blob->dataEnd);
++	if (entry.length < 0)
++	    abort();
+ 	entry.rdlen = 0;
+ 	td->tag = einfo.tag;
+ 	rc = copyTdEntry(&entry, td, HEADERGET_MINMEM) ? RPMRC_OK : RPMRC_FAIL;
+-- 
+2.30.2
+

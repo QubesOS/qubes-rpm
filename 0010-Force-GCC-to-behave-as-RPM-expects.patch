@@ -1,0 +1,97 @@
+From 45c0c0338c4ceed47c328ace5cc2e89f5dd3d929 Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Sat, 20 Mar 2021 14:30:03 -0400
+Subject: [PATCH 10/16] Force GCC to behave as RPM expects
+
+RPM assumes that integers and pointers have twos-complement
+representation and semantics.  In particular, it assumes that it can
+freely create out-of-bounds pointers.  It also assumes that strict
+aliasing is not enforced.  Therefore, GCC needs to be made to behave
+accordingly.
+
+Also fix a case where a zero-sized tag data entry was wrongly accepted.
+---
+ configure.ac | 9 ++++++---
+ lib/header.c | 8 ++++----
+ lib/rpmtag.h | 2 +-
+ 3 files changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 34ea85f..40efb26 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -37,7 +37,7 @@ fi
+ AS=${AS-as}
+ AC_SUBST(AS)
+ if test "$GCC" = yes; then
+-    cflags_to_try="-fno-strict-aliasing -fstack-protector -Wempty-body"
++    cflags_to_try="-fno-strict-aliasing -fstack-protector -Wempty-body -fwrapv-pointer"
+     AC_MSG_CHECKING([supported compiler flags])
+     old_cflags=$CFLAGS
+     echo
+@@ -50,9 +50,12 @@ if test "$GCC" = yes; then
+         ],[])
+         CFLAGS=$old_cflags
+     done
+-    RPMCFLAGS="-fPIC -DPIC -D_REENTRANT -Wall -Wpointer-arith -Wmissing-prototypes -Wstrict-prototypes $RPMCFLAGS"
++    RPMCFLAGS="-fPIC -DPIC -D_REENTRANT -Wall -Wpointer-arith \
++        -Wmissing-prototypes -Wstrict-prototypes $RPMCFLAGS \
++        -fno-delete-null-pointer-checks -fwrapv \
++        -fno-strict-overflow -fno-strict-aliasing"
+ fi
+-AC_SUBST(RPMCFLAGS)
++AC_SUBST([RPMCFLAGS])
+ 
+ AC_SYS_LARGEFILE
+ 
+diff --git a/lib/header.c b/lib/header.c
+index 53d8c8a..39f5a28 100644
+--- a/lib/header.c
++++ b/lib/header.c
+@@ -312,9 +312,9 @@ static rpmRC hdrblobVerifyInfo(hdrblob blob, char **emsg, int exact_size)
+ 	/* Verify the data actually fits */
+ 	len = dataLength(info.type, ds + info.offset,
+ 			 info.count, 1, ds + blob->dl);
+-	end = info.offset + len;
+-	if (hdrchkRange(blob->dl, end) || len <= 0)
++	if (len <= 0 || blob->dl - info.offset < len)
+ 	    goto err;
++	end = info.offset + len;
+     }
+     return 0; /* Everything ok */
+ 
+@@ -461,7 +461,7 @@ static int dataLength(rpm_tagtype_t type, rpm_constdata_t p, rpm_count_t count,
+     const char * se = pend;
+     int length = 0;
+ 
+-    assert(!hdrchkType(type));
++    assert(!hdrchkType(type) && !hdrchkData(count));
+ 
+     switch (type) {
+     case RPM_STRING_TYPE:
+@@ -490,7 +490,7 @@ static int dataLength(rpm_tagtype_t type, rpm_constdata_t p, rpm_count_t count,
+ 	if (typeSizes[type] == -1)
+ 	    return -1;
+ 	length = typeSizes[(type & 0xf)] * count;
+-	if (length < 0 || (se && (s + length) > se))
++	if (length <= 0 || (se && length > se - s))
+ 	    return -1;
+ 	break;
+     }
+diff --git a/lib/rpmtag.h b/lib/rpmtag.h
+index 8c718b3..e28454c 100644
+--- a/lib/rpmtag.h
++++ b/lib/rpmtag.h
+@@ -429,8 +429,8 @@ typedef enum rpmSigTag_e {
+  * The basic types of data in tags from headers.
+  */
+ typedef enum rpmTagType_e {
+-#define	RPM_MIN_TYPE		0
+     RPM_NULL_TYPE		=  0,
++#define	RPM_MIN_TYPE		1
+     RPM_CHAR_TYPE		=  1,
+     RPM_INT8_TYPE		=  2,
+     RPM_INT16_TYPE		=  3,
+-- 
+2.30.2
+

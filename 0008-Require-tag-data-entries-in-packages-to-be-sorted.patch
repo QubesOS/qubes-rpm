@@ -1,0 +1,52 @@
+From c4641b14f0f66324e462ab195f5d1c688c332e7a Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Tue, 23 Mar 2021 12:22:31 -0400
+Subject: [PATCH 08/16] Require tag data entries in packages to be sorted
+
+This was accepted for RPMv6 (upstream issue 1555) but cannot be
+implemented in RPMv4 for compatibility with broken packages.  We do not
+need to accept such broken packages, however.
+---
+ lib/header.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/lib/header.c b/lib/header.c
+index a1fbba8..26580c0 100644
+--- a/lib/header.c
++++ b/lib/header.c
+@@ -274,11 +274,11 @@ Header headerNew(void)
+     return headerCreate(NULL, 0);
+ }
+ 
+-static rpmRC hdrblobVerifyInfo(hdrblob blob, char **emsg)
++static rpmRC hdrblobVerifyInfo(hdrblob blob, char **emsg, int exact_size)
+ {
+     struct entryInfo_s info;
+     int i, len = 0;
+-    int32_t end = 0;
++    int32_t end = 0, last_tag = RPMTAG_HEADERI18NTABLE - 1;
+     const char *ds = (const char *) blob->dataStart;
+     int32_t il = (blob->regionTag) ? blob->il-1 : blob->il;
+     entryInfo pe = (blob->regionTag) ? blob->pe+1 : blob->pe;
+@@ -295,6 +295,9 @@ static rpmRC hdrblobVerifyInfo(hdrblob blob, char **emsg)
+ 
+ 	if (hdrchkTag(info.tag))
+ 	    goto err;
++	if (exact_size && last_tag >= info.tag)
++	    goto err;
++	last_tag = info.tag;
+ 	if (hdrchkType(info.type))
+ 	    goto err;
+ 	if (hdrchkCount(blob->dl, info.count))
+@@ -2026,7 +2029,7 @@ rpmRC hdrblobInit(const void *uh, size_t uc,
+ 	goto exit;
+ 
+     /* Sanity check the rest of the header structure. */
+-    if (hdrblobVerifyInfo(blob, emsg))
++    if (hdrblobVerifyInfo(blob, emsg, exact_size))
+ 	goto exit;
+ 
+     rc = RPMRC_OK;
+-- 
+2.30.2
+

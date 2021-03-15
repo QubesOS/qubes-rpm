@@ -1,0 +1,31 @@
+From 0486b2bfa3751d4737f124adb13e9f1ff7452f36 Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Tue, 23 Mar 2021 12:24:56 -0400
+Subject: [PATCH 09/16] Reject RPMv3 packages
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Modern rpmsign isn’t even able to sign them, so we don’t need to worry
+about needing to support them in dom0.
+---
+ lib/header.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/lib/header.c b/lib/header.c
+index 26580c0..53d8c8a 100644
+--- a/lib/header.c
++++ b/lib/header.c
+@@ -1831,7 +1831,8 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
+ 
+     /* Is there an immutable header region tag? */
+     if (!(einfo.tag == regionTag)) {
+-	rc = RPMRC_NOTFOUND;
++	if (!exact_size)
++	    rc = RPMRC_NOTFOUND;
+ 	goto exit;
+     }
+ 
+-- 
+2.30.2
+

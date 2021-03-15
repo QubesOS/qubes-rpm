@@ -1,0 +1,40 @@
+From 6d81ac2f6ea4d29af9fc3d9cda56e67304657e8b Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Tue, 23 Mar 2021 11:26:45 -0400
+Subject: [PATCH 02/16] Reasonableness check on header tag entry count
+
+This is upstream 5e40166380a450a36b302914be60fd004624f724 and
+d8fbddfa5051bdc1c71e16cb11f14d9fdc7f5c5e.
+---
+ lib/header.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/lib/header.c b/lib/header.c
+index 0d19efd..527c93e 100644
+--- a/lib/header.c
++++ b/lib/header.c
+@@ -140,6 +140,12 @@ static const size_t headerMaxbytes = (256*1024*1024);
+  */
+ #define hdrchkType(_type) ((_type) < RPM_MIN_TYPE || (_type) > RPM_MAX_TYPE)
+ 
++/**
++ * Reasonableness check on count values.
++ * Most types have further restrictions, these are just the outer perimeter.
++ */
++#define hdrchkCount(_dl, _count) ((_count) < 1 || (_count) > (_dl))
++
+ /**
+  * Sanity check on data size and/or offset and/or count.
+  * This check imposes a limit of 256 MB -- file signatures
+@@ -289,6 +295,8 @@ static rpmRC hdrblobVerifyInfo(hdrblob blob, char **emsg)
+ 	    goto err;
+ 	if (hdrchkType(info.type))
+ 	    goto err;
++	if (hdrchkCount(blob->dl, info.count))
++	    goto err;
+ 	if (hdrchkAlign(info.type, info.offset))
+ 	    goto err;
+ 	if (hdrchkRange(blob->dl, info.offset))
+-- 
+2.30.2
+
