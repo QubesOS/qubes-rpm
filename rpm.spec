@@ -10,8 +10,8 @@
 %bcond_with sanitizer
 # build with libarchive? (needed for rpm2archive)
 %bcond_without libarchive
-# build with libimaevm.so
-%bcond_without libimaevm
+# build without libimaevm.so
+%bcond_with libimaevm
 # build with new db format
 %bcond_with ndb
 # build with zstd support?
