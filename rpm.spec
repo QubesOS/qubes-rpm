@@ -71,6 +71,8 @@ Patch101: 0001-rpmfc-push-name-epoch-version-release-macro-before-i.patch
 Patch906: rpm-4.7.1-geode-i686.patch
 # Probably to be upstreamed in slightly different form
 Patch907: rpm-4.13.90-ldflags.patch
+# CVE patch
+Patch909: Fix-CVE-2021-20271-and-CVE-2021-3421.patch
 
 # Partially GPL/LGPL dual-licensed and some bits with BSD
 # SourceLicense: (GPLv2+ and LGPLv2+ with exceptions) and BSD 
@@ -340,7 +342,7 @@ Requires: rpm-libs%{_isa} = %{version}-%{release}
 Useful on legacy SysV init systems if you run rpm transactions with
 nice/ionice priorities. Should not be used on systemd systems.
 
-%endif # with plugins
+%endif
 
 %prep
 %autosetup -n %{name}-%{srcver} %{?with_int_bdb:-a 1} -p1
@@ -540,7 +542,7 @@ make check || cat tests/rpmtests.log
 
 %files plugin-prioreset
 %{_libdir}/rpm-plugins/prioreset.so
-%endif # with plugins
+%endif
 
 %files build-libs
 %{_libdir}/librpmbuild.so.*
