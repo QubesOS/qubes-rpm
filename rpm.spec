@@ -73,6 +73,7 @@ Patch906: rpm-4.7.1-geode-i686.patch
 Patch907: rpm-4.13.90-ldflags.patch
 # CVE patch
 Patch909: Fix-CVE-2021-20271-and-CVE-2021-3421.patch
+Patch910: Verify-lengths-in-hdrblobInit.patch
 
 # Partially GPL/LGPL dual-licensed and some bits with BSD
 # SourceLicense: (GPLv2+ and LGPLv2+ with exceptions) and BSD 
