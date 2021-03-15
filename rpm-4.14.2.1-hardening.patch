@@ -1,0 +1,165 @@
+diff --git a/lib/header.c b/lib/header.c
+index 5b09f83..bb88cbd 100644
+--- a/lib/header.c
++++ b/lib/header.c
+@@ -9,6 +9,7 @@
+ /* network byte order and is converted on the fly to host order. */
+ 
+ #include "system.h"
++#include <stdlib.h>
+ #include <netdb.h>
+ #include <errno.h>
+ #include <rpm/rpmtypes.h>
+@@ -139,6 +140,12 @@ static const size_t headerMaxbytes = (256*1024*1024);
+  */
+ #define hdrchkType(_type) ((_type) < RPM_MIN_TYPE || (_type) > RPM_MAX_TYPE)
+ 
++/**
++ * Reality check on counts.
++ **/
++#define hdrchkCount(_count) ((_count) <= 0 || (_count) > HEADER_DATA_MAX)
++
++
+ /**
+  * Sanity check on data size and/or offset and/or count.
+  * This check imposes a limit of 256 MB -- file signatures
+@@ -265,11 +272,11 @@ Header headerNew(void)
+     return headerCreate(NULL, 0);
+ }
+ 
+-static rpmRC hdrblobVerifyInfo(hdrblob blob, char **emsg)
++static rpmRC hdrblobVerifyInfo(hdrblob blob, char **emsg, int exact_size)
+ {
+     struct entryInfo_s info;
+     int i, len = 0;
+-    int32_t end = 0;
++    int32_t end = 0, last_tag = RPMTAG_HEADERI18NTABLE - 1;
+     const char *ds = (const char *) blob->dataStart;
+     int32_t il = (blob->regionTag) ? blob->il-1 : blob->il;
+     entryInfo pe = (blob->regionTag) ? blob->pe+1 : blob->pe;
+@@ -286,8 +293,13 @@ static rpmRC hdrblobVerifyInfo(hdrblob blob, char **emsg)
+ 
+ 	if (hdrchkTag(info.tag))
+ 	    goto err;
++	if (exact_size && last_tag >= info.tag)
++	    goto err;
++	last_tag = info.tag;
+ 	if (hdrchkType(info.type))
+ 	    goto err;
++	if (hdrchkCount(info.count))
++	    goto err;
+ 	if (hdrchkAlign(info.type, info.offset))
+ 	    goto err;
+ 	if (hdrchkRange(blob->dl, info.offset))
+@@ -408,12 +420,12 @@ unsigned headerSizeof(Header h, int magicp)
+ static inline int strtaglen(const char *str, rpm_count_t c, const char *end)
+ {
+     const char *start = str;
+-    const char *s;
++    const char *s = NULL;
+ 
+     if (end) {
+ 	if (str >= end)
+ 	    return -1;
+-	while ((s = memchr(start, '\0', end-start))) {
++	while (end > start && (s = memchr(start, '\0', end-start))) {
+ 	    if (--c == 0 || s > end)
+ 		break;
+ 	    start = s + 1;
+@@ -425,7 +437,7 @@ static inline int strtaglen(const char *str, rpm_count_t c, const char *end)
+ 	    start = s + 1;
+ 	}
+     }
+-    return (c > 0) ? -1 : (s - str + 1);
++    return (s == NULL || c > 0) ? -1 : (s - str + 1);
+ }
+ 
+ /**
+@@ -444,6 +456,9 @@ static int dataLength(rpm_tagtype_t type, rpm_constdata_t p, rpm_count_t count,
+     const char * se = pend;
+     int length = 0;
+ 
++    if (hdrchkType(type) || hdrchkCount(count))
++	return -1;
++
+     switch (type) {
+     case RPM_STRING_TYPE:
+ 	if (count != 1)
+@@ -1812,7 +1827,6 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
+ 
+     /* Is there an immutable header region tag? */
+     if (!(einfo.tag == regionTag)) {
+-	rc = RPMRC_NOTFOUND;
+ 	goto exit;
+     }
+ 
+@@ -1825,7 +1839,7 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
+     }
+ 
+     /* Is the trailer within the data area? */
+-    if (hdrchkRange(blob->dl, einfo.offset + REGION_TAG_COUNT)) {
++    if (einfo.offset <= 0 || (size_t)einfo.offset + REGION_TAG_COUNT > blob->dl) {
+ 	rasprintf(buf,
+ 		_("region offset: BAD, tag %d type %d offset %d count %d"),
+ 		einfo.tag, einfo.type, einfo.offset, einfo.count);
+@@ -1840,8 +1854,6 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
+     blob->rdl = regionEnd - blob->dataStart;
+ 
+     ei2h(&trailer, &einfo);
+-    /* Trailer offset is negative and has a special meaning */
+-    einfo.offset = -einfo.offset;
+     if (!(einfo.tag == regionTag &&
+ 	  einfo.type == REGION_TAG_TYPE && einfo.count == REGION_TAG_COUNT))
+     {
+@@ -1851,8 +1863,12 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
+ 	goto exit;
+     }
+ 
++    /*
++     * Trailer offset is negative and has a special meaning.  Negate *after*
++     * division to prevent overflow.  Watch out for precedence!
++     */
++    blob->ril = -(einfo.offset/sizeof(*blob->pe));
+     /* Does the region actually fit within the header? */
+-    blob->ril = einfo.offset/sizeof(*blob->pe);
+     if ((einfo.offset % sizeof(*blob->pe)) || hdrchkRange(blob->il, blob->ril) ||
+ 					hdrchkRange(blob->dl, blob->rdl)) {
+ 	rasprintf(buf, _("region %d size: BAD, ril %d il %d rdl %d dl %d"),
+@@ -1991,11 +2007,11 @@ rpmRC hdrblobInit(const void *uh, size_t uc,
+ 	goto exit;
+     }
+ 
+-    if (hdrblobVerifyRegion(regionTag, exact_size, blob, emsg) == RPMRC_FAIL)
++    if (hdrblobVerifyRegion(regionTag, exact_size, blob, emsg))
+ 	goto exit;
+ 
+     /* Sanity check the rest of the header structure. */
+-    if (hdrblobVerifyInfo(blob, emsg))
++    if (hdrblobVerifyInfo(blob, emsg, exact_size))
+ 	goto exit;
+ 
+     rc = RPMRC_OK;
+@@ -2030,6 +2046,8 @@ rpmRC hdrblobGet(hdrblob blob, uint32_t tag, rpmtd td)
+ 	entry.data = blob->dataStart + einfo.offset;
+ 	entry.length = dataLength(einfo.type, blob->dataStart + einfo.offset,
+ 			 einfo.count, 1, blob->dataEnd);
++	if (entry.length < 0)
++	    abort();
+ 	entry.rdlen = 0;
+ 	td->tag = einfo.tag;
+ 	rc = copyTdEntry(&entry, td, HEADERGET_MINMEM) ? RPMRC_OK : RPMRC_FAIL;
+diff --git a/lib/rpmchecksig.c b/lib/rpmchecksig.c
+index 6bc6a61..f57dcfa 100644
+--- a/lib/rpmchecksig.c
++++ b/lib/rpmchecksig.c
+@@ -171,8 +171,8 @@ rpmRC rpmpkgRead(struct rpmvs_s *vs, FD_t fd,
+ 	goto exit;
+     }
+ 
+-    /* Read the signature header. Might not be in a contiguous region. */
+-    if (hdrblobRead(fd, 1, 0, RPMTAG_HEADERSIGNATURES, sigblob, &msg))
++    /* Read the signature header. Must be in a contiguous region. */
++    if (hdrblobRead(fd, 1, 1, RPMTAG_HEADERSIGNATURES, sigblob, &msg))
+ 	goto exit;
+ 
+     rpmvsInit(vs, sigblob, bundle);

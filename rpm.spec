@@ -71,6 +71,7 @@ Patch101: 0001-rpmfc-push-name-epoch-version-release-macro-before-i.patch
 Patch906: rpm-4.7.1-geode-i686.patch
 # Probably to be upstreamed in slightly different form
 Patch907: rpm-4.13.90-ldflags.patch
+Patch908: rpm-4.14.2.1-hardening.patch
 
 # Partially GPL/LGPL dual-licensed and some bits with BSD
 # SourceLicense: (GPLv2+ and LGPLv2+ with exceptions) and BSD 
