@@ -23,7 +23,7 @@
 
 %global rpmver 4.14.2.1
 #global snapver rc2
-%global rel 2
+%global rel 3
 
 %global srcver %{version}%{?snapver:-%{snapver}}
 %global srcdir %{?snapver:testing}%{!?snapver:%{name}-%(echo %{version} | cut -d'.' -f1-2).x}
