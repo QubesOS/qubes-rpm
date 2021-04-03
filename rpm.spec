@@ -83,6 +83,10 @@ Patch916: 0007-Add-assertions-for-out-of-bounds-errors.patch
 Patch917: 0008-Require-tag-data-entries-in-packages-to-be-sorted.patch
 Patch918: 0009-Reject-RPMv3-packages.patch
 Patch919: 0010-Force-GCC-to-behave-as-RPM-expects.patch
+Patch920: 0011-Remove-useless-variable.patch
+Patch921: 0012-Require-package-headers-to-be-more-than-a-region.patch
+Patch922: 0013-Top-level-signatures-must-stand-alone.patch
+Patch923: 0014-RPM_NULL_TYPE-is-not-a-valid-type.patch
 
 # Partially GPL/LGPL dual-licensed and some bits with BSD
 # SourceLicense: (GPLv2+ and LGPLv2+ with exceptions) and BSD 

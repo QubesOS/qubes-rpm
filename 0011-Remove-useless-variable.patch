@@ -1,0 +1,36 @@
+From e65a001c5348a7ae507ffe5b6f7f4892c24f9700 Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Fri, 2 Apr 2021 22:12:09 -0400
+Subject: [PATCH 11/17] Remove useless variable
+
+regionEnd did not need to be a separate variable.
+---
+ lib/header.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/lib/header.c b/lib/header.c
+index b547096..dc8e40e 100644
+--- a/lib/header.c
++++ b/lib/header.c
+@@ -1812,7 +1812,6 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
+ {
+     rpmRC rc = RPMRC_FAIL;
+     struct entryInfo_s trailer, einfo;
+-    unsigned char * regionEnd = NULL;
+ 
+     /* Check that we have at least on tag */
+     if (blob->il < 1) {
+@@ -1856,9 +1855,7 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
+ 
+     /* Is there an immutable header region tag trailer? */
+     memset(&trailer, 0, sizeof(trailer));
+-    regionEnd = blob->dataStart + einfo.offset;
+-    (void) memcpy(&trailer, regionEnd, REGION_TAG_COUNT);
+-    regionEnd += REGION_TAG_COUNT;
++    memcpy(&trailer, blob->dataStart + einfo.offset, REGION_TAG_COUNT);
+ 
+     ei2h(&trailer, &einfo);
+     if (!(einfo.tag == regionTag &&
+-- 
+2.30.2
+

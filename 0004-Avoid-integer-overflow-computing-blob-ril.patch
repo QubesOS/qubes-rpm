@@ -1,7 +1,7 @@
 From 10c92b935ee82f90c620ccc179a12eee42cabc1e Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Tue, 23 Mar 2021 11:42:19 -0400
-Subject: [PATCH 04/16] Avoid integer overflow computing blob->ril
+Subject: [PATCH 04/17] Avoid integer overflow computing blob->ril
 
 This is upstream c3e04c2ac91737b06ce5592e8cd8558498e566c0 and
 1efe530450b5bdbd90128327be56c87fa1b6843b.

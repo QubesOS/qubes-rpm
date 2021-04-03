@@ -1,7 +1,7 @@
 From 02b24b2a0b9a23702ce679efe039a3616ebfbebe Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Tue, 23 Mar 2021 11:45:43 -0400
-Subject: [PATCH 05/16] Avoid integer overflow computing blob->rdl
+Subject: [PATCH 05/17] Avoid integer overflow computing blob->rdl
 
 This is CVE-2021-20249 and upstream PR#1583, which was rejected although
 correct.  Upstream cannot assume the compiler supports

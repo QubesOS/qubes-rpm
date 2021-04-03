@@ -1,0 +1,27 @@
+From 3bec2657b20e47720ffb540de86093b0c31f2a78 Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Mon, 5 Apr 2021 14:03:06 -0400
+Subject: [PATCH 14/17] RPM_NULL_TYPE is not a valid type
+
+Such entries were rejected as having length 0 anyway, but they make no
+sense and rejecting them earlier is simpler.
+---
+ lib/header.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/header.c b/lib/header.c
+index 8b9b3c5..24ed696 100644
+--- a/lib/header.c
++++ b/lib/header.c
+@@ -140,7 +140,7 @@ static const size_t headerMaxbytes = (256*1024*1024);
+ /**
+  * Sanity check on type values.
+  */
+-#define hdrchkType(_type) ((_type) < RPM_MIN_TYPE || (_type) > RPM_MAX_TYPE)
++#define hdrchkType(_type) ((_type) <= RPM_MIN_TYPE || (_type) > RPM_MAX_TYPE)
+ 
+ /**
+  * Reasonableness check on count values.
+-- 
+2.30.2
+

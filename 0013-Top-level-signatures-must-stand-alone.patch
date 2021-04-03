@@ -1,0 +1,28 @@
+From 0935e27959afc2f4bb651eda7485306bec7778ba Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Fri, 2 Apr 2021 22:17:09 -0400
+Subject: [PATCH 13/17] Top-level signatures must stand alone
+
+It makes no sense for a top-level signature to be more than one packet,
+and allowing it increases attack surface significantly.
+---
+ rpmio/rpmpgp.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/rpmio/rpmpgp.c b/rpmio/rpmpgp.c
+index 061751a..ad34827 100644
+--- a/rpmio/rpmpgp.c
++++ b/rpmio/rpmpgp.c
+@@ -1025,6 +1025,9 @@ int pgpPrtParams(const uint8_t * pkts, size_t pktlen, unsigned int pkttype,
+ 	    break;
+ 
+ 	p += (pkt.body - pkt.head) + pkt.blen;
++	/* If we are expecting a signature, it must be the only packet */
++	if (pkttype == PGPTAG_SIGNATURE)
++	    break;
+     }
+ 
+     rc = (digp && (p == pend)) ? 0 : -1;
+-- 
+2.30.2
+

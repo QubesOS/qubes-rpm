@@ -1,7 +1,7 @@
 From 98ccde1ad46c57c0ec089c63e99d2a58eca1d522 Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Tue, 23 Mar 2021 11:50:11 -0400
-Subject: [PATCH 07/16] Add assertions for out-of-bounds errors
+Subject: [PATCH 07/17] Add assertions for out-of-bounds errors
 
 If we wind up in dataLength() with an invalid data type, we could access
 a global variable out of bounds.  Crash instead.

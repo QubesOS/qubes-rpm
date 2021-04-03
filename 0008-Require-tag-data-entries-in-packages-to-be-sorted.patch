@@ -1,7 +1,7 @@
 From c4641b14f0f66324e462ab195f5d1c688c332e7a Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Tue, 23 Mar 2021 12:22:31 -0400
-Subject: [PATCH 08/16] Require tag data entries in packages to be sorted
+Subject: [PATCH 08/17] Require tag data entries in packages to be sorted
 
 This was accepted for RPMv6 (upstream issue 1555) but cannot be
 implemented in RPMv4 for compatibility with broken packages.  We do not
