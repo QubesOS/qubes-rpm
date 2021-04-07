@@ -3,3 +3,16 @@ include:
     file: '/r4.0/gitlab-base.yml'
   - project: 'QubesOS/qubes-continuous-integration'
     file: '/r4.0/gitlab-dom0.yml'
+
+smoke-test:
+  extends: install:dom0-fc25
+  script:
+    - export BUILDERCONF=scripts/gitlab-builder.conf
+    - make -C ~/qubes-builder prepare-chroot-dom0 COMPONENTS='$(BUILDER_PLUGINS)'
+    - export CHROOT_DIR=$HOME/qubes-builder/chroot-dom0-${DIST_DOM0}
+    - ~/qubes-builder/scripts/gitlab-install
+    - sudo chroot "$CHROOT_DIR" rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-25-primary
+    - sudo chroot "$CHROOT_DIR" rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-4.0-primary
+    - cp test.py ~/qubes-builder/chroot-dom0-${DIST_DOM0}/tmp/
+    - sudo dnf install -y --installroot=$HOME/qubes-builder/chroot-dom0-${DIST_DOM0} python3-requests
+    - sudo chroot ~/qubes-builder/chroot-dom0-${DIST_DOM0} /tmp/test.py
