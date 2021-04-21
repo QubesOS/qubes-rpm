@@ -1,7 +1,7 @@
-From c4641b14f0f66324e462ab195f5d1c688c332e7a Mon Sep 17 00:00:00 2001
+From 9b409fab47d6d99fd8a6908ec65fe04fd0fc1469 Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Tue, 23 Mar 2021 12:22:31 -0400
-Subject: [PATCH 08/17] Require tag data entries in packages to be sorted
+Subject: [PATCH 08/14] Require tag data entries in packages to be sorted
 
 This was accepted for RPMv6 (upstream issue 1555) but cannot be
 implemented in RPMv4 for compatibility with broken packages.  We do not
@@ -11,7 +11,7 @@ need to accept such broken packages, however.
  1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/lib/header.c b/lib/header.c
-index a1fbba8..26580c0 100644
+index 5b41285..b16e4e0 100644
 --- a/lib/header.c
 +++ b/lib/header.c
 @@ -274,11 +274,11 @@ Header headerNew(void)
@@ -38,7 +38,7 @@ index a1fbba8..26580c0 100644
  	if (hdrchkType(info.type))
  	    goto err;
  	if (hdrchkCount(blob->dl, info.count))
-@@ -2026,7 +2029,7 @@ rpmRC hdrblobInit(const void *uh, size_t uc,
+@@ -2027,7 +2030,7 @@ rpmRC hdrblobInit(const void *uh, size_t uc,
  	goto exit;
  
      /* Sanity check the rest of the header structure. */

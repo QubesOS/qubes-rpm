@@ -1,7 +1,7 @@
-From f2eaf0a7755002591b20125761fb38b1ae69bea1 Mon Sep 17 00:00:00 2001
+From 282140b9d77f1e1b0638a8d6454f7062720513f3 Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Tue, 23 Mar 2021 12:24:56 -0400
-Subject: [PATCH 09/17] Reject RPMv3 packages
+Subject: [PATCH 09/14] Reject RPMv3 packages
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -14,7 +14,7 @@ we don’t need to worry about needing to support them in dom0.
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/lib/header.c b/lib/header.c
-index 26580c0..f5e62bb 100644
+index b16e4e0..569d4aa 100644
 --- a/lib/header.c
 +++ b/lib/header.c
 @@ -1831,7 +1831,9 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,

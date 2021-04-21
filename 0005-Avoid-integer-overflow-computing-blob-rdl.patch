@@ -1,17 +1,15 @@
-From 02b24b2a0b9a23702ce679efe039a3616ebfbebe Mon Sep 17 00:00:00 2001
+From 66beeec8488dfe0cfdf6da201ebe81d4d9aad58a Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Tue, 23 Mar 2021 11:45:43 -0400
-Subject: [PATCH 05/17] Avoid integer overflow computing blob->rdl
+Subject: [PATCH 05/14] Avoid integer overflow computing blob->rdl
 
-This is CVE-2021-20249 and upstream PR#1583, which was rejected although
-correct.  Upstream cannot assume the compiler supports
-__builtin_add_overflow, but we can.
+This is CVE-2021-20249.
 ---
- lib/header.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ lib/header.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/lib/header.c b/lib/header.c
-index 0a6f08b..2b14b42 100644
+index fc44070..a1b69d2 100644
 --- a/lib/header.c
 +++ b/lib/header.c
 @@ -1837,7 +1837,8 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
@@ -19,19 +17,11 @@ index 0a6f08b..2b14b42 100644
  
      /* Is the trailer within the data area? */
 -    if (hdrchkRange(blob->dl, einfo.offset + REGION_TAG_COUNT)) {
-+    if (__builtin_add_overflow(einfo.offset, REGION_TAG_COUNT, &blob->rdl) ||
-+	hdrchkRange(blob->dl, blob->rdl)) {
++    if (hdrchkData(einfo.offset) ||
++	hdrchkRange(blob->dl, einfo.offset + REGION_TAG_COUNT)) {
  	rasprintf(buf,
  		_("region offset: BAD, tag %d type %d offset %d count %d"),
  		einfo.tag, einfo.type, einfo.offset, einfo.count);
-@@ -1849,7 +1850,6 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
-     regionEnd = blob->dataStart + einfo.offset;
-     (void) memcpy(&trailer, regionEnd, REGION_TAG_COUNT);
-     regionEnd += REGION_TAG_COUNT;
--    blob->rdl = regionEnd - blob->dataStart;
- 
-     ei2h(&trailer, &einfo);
-     if (!(einfo.tag == regionTag &&
 -- 
 2.30.2
 

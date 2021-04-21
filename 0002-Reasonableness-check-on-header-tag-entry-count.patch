@@ -1,7 +1,7 @@
 From 6d81ac2f6ea4d29af9fc3d9cda56e67304657e8b Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Tue, 23 Mar 2021 11:26:45 -0400
-Subject: [PATCH 02/17] Reasonableness check on header tag entry count
+Subject: [PATCH 02/14] Reasonableness check on header tag entry count
 
 This is upstream 5e40166380a450a36b302914be60fd004624f724 and
 d8fbddfa5051bdc1c71e16cb11f14d9fdc7f5c5e.

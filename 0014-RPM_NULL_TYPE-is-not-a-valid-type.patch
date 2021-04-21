@@ -1,7 +1,7 @@
-From 3bec2657b20e47720ffb540de86093b0c31f2a78 Mon Sep 17 00:00:00 2001
+From 4e9e018afddf8bae813db823a448817735de8b50 Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Mon, 5 Apr 2021 14:03:06 -0400
-Subject: [PATCH 14/17] RPM_NULL_TYPE is not a valid type
+Subject: [PATCH 14/14] RPM_NULL_TYPE is not a valid type
 
 Such entries were rejected as having length 0 anyway, but they make no
 sense and rejecting them earlier is simpler.
@@ -10,7 +10,7 @@ sense and rejecting them earlier is simpler.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/lib/header.c b/lib/header.c
-index 8b9b3c5..24ed696 100644
+index 9f47b19..feeabcd 100644
 --- a/lib/header.c
 +++ b/lib/header.c
 @@ -140,7 +140,7 @@ static const size_t headerMaxbytes = (256*1024*1024);
