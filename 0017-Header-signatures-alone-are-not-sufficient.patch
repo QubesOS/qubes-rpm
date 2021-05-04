@@ -1,0 +1,74 @@
+From d9e53952897dafd668077575baf8e88eacc48e74 Mon Sep 17 00:00:00 2001
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+Date: Tue, 4 May 2021 16:24:55 -0400
+Subject: [PATCH 17/22] Header signatures alone are not sufficient
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This fixes how RPM handles packages that contain a header signature, but
+neither header+payload signature nor payload digests.  Such packages are
+obviously not properly signed, but RPM previously accepted them.
+
+This could be used to confuse both ‘rpmkeys -K’ and DNF.  Both would
+report that the package has been properly signed even when it has not.
+---
+ lib/rpmvs.c        | 14 +++++++++++---
+ tests/rpmsigdig.at |  1 +
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/lib/rpmvs.c b/lib/rpmvs.c
+index 7b5b86f..c5380a8 100644
+--- a/lib/rpmvs.c
++++ b/lib/rpmvs.c
+@@ -419,7 +419,7 @@ int rpmvsVerify(struct rpmvs_s *sis, int type,
+ {
+     int failed = 0;
+     int cont = 1;
+-    int range = 0;
++    int range = 0, vfylevel = sis->vfylevel;
+     int verified[3] = { 0, 0, 0 };
+ 
+     /* sort for consistency and rough "better comes first" semantics*/
+@@ -446,16 +446,24 @@ int rpmvsVerify(struct rpmvs_s *sis, int type,
+ 	}
+     }
+ 
++    /* Unconditionally reject partially signed messages */
++    if (verified[RPMSIG_SIGNATURE_TYPE])
++	vfylevel |= RPMSIG_SIGNATURE_TYPE;
++
++    /* Cannot verify payload if RPMVSF_NEEDPAYLOAD is set */
++    if (sis->vsflags & RPMVSF_NEEDPAYLOAD)
++	range &= ~RPMSIG_PAYLOAD;
++
+     for (int i = 0; i < sis->nsigs && cont; i++) {
+ 	struct rpmsinfo_s *sinfo = &sis->sigs[i];
+ 	int strength = (sinfo->type | sinfo->strength);
+ 	int required = 0;
+ 
+-	if (sis->vfylevel & strength & RPMSIG_DIGEST_TYPE) {
++	if (vfylevel & strength & RPMSIG_DIGEST_TYPE) {
+ 	    int missing = (range & ~verified[RPMSIG_DIGEST_TYPE]);
+ 	    required |= (missing & sinfo->range);
+ 	}
+-	if (sis->vfylevel & strength & RPMSIG_SIGNATURE_TYPE) {
++	if (vfylevel & strength & RPMSIG_SIGNATURE_TYPE) {
+ 	    int missing = (range & ~verified[RPMSIG_SIGNATURE_TYPE]);
+ 	    required |= (missing & sinfo->range);
+ 	}
+diff --git a/tests/rpmsigdig.at b/tests/rpmsigdig.at
+index 09fcdd5..45195fe 100644
+--- a/tests/rpmsigdig.at
++++ b/tests/rpmsigdig.at
+@@ -384,6 +384,7 @@ runroot rpmkeys -Kv /tmp/${pkg}
+     Header SHA1 digest: OK
+     Payload SHA256 digest: BAD (Expected 84a7338287bf19715c4eed0243f5cdb447eeb0ade37b2af718d4060aefca2f7c != bea903609dceac36e1f26a983c493c98064d320fdfeb423034ed63d649b2c8dc)
+     V4 RSA/SHA256 Signature, key ID 1964c5fc: BAD
++    DSA signature: NOTFOUND
+     MD5 digest: BAD (Expected 137ca1d8b35cca02a1854ba301c5432e != d662cd0d81601a7107312684ad1ddf38)
+ ],
+ [])
+-- 
+2.30.2
+

@@ -1,7 +1,7 @@
-From 066b52a669dbd5c06b9bb0d1f48a2052b78ec030 Mon Sep 17 00:00:00 2001
+From c31b637174b8c35e6e1effd0bdc5b9cd0addaa9b Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Sat, 20 Mar 2021 14:30:03 -0400
-Subject: [PATCH 10/17] Force GCC to behave as RPM expects
+Subject: [PATCH 10/22] Force GCC to behave as RPM expects
 
 RPM assumes that integers and pointers have twos-complement
 representation and semantics.  In particular, it assumes that it can
@@ -44,7 +44,7 @@ index 34ea85f..40efb26 100644
  AC_SYS_LARGEFILE
  
 diff --git a/lib/header.c b/lib/header.c
-index f5e62bb..b547096 100644
+index 569d4aa..9fc8f4d 100644
 --- a/lib/header.c
 +++ b/lib/header.c
 @@ -312,9 +312,9 @@ static rpmRC hdrblobVerifyInfo(hdrblob blob, char **emsg, int exact_size)

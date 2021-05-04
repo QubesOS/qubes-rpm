@@ -1,7 +1,7 @@
-From 98ccde1ad46c57c0ec089c63e99d2a58eca1d522 Mon Sep 17 00:00:00 2001
+From 77f7a510319e06af0f97c81d02555932d1d9c44c Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Tue, 23 Mar 2021 11:50:11 -0400
-Subject: [PATCH 07/17] Add assertions for out-of-bounds errors
+Subject: [PATCH 07/22] Add assertions for out-of-bounds errors
 
 If we wind up in dataLength() with an invalid data type, we could access
 a global variable out of bounds.  Crash instead.
@@ -10,7 +10,7 @@ a global variable out of bounds.  Crash instead.
  1 file changed, 6 insertions(+)
 
 diff --git a/lib/header.c b/lib/header.c
-index 2b14b42..a1fbba8 100644
+index a1b69d2..5b41285 100644
 --- a/lib/header.c
 +++ b/lib/header.c
 @@ -9,6 +9,8 @@
@@ -31,7 +31,7 @@ index 2b14b42..a1fbba8 100644
      switch (type) {
      case RPM_STRING_TYPE:
  	if (count != 1)
-@@ -2057,6 +2061,8 @@ rpmRC hdrblobGet(hdrblob blob, uint32_t tag, rpmtd td)
+@@ -2058,6 +2062,8 @@ rpmRC hdrblobGet(hdrblob blob, uint32_t tag, rpmtd td)
  	entry.data = blob->dataStart + einfo.offset;
  	entry.length = dataLength(einfo.type, blob->dataStart + einfo.offset,
  			 einfo.count, 1, blob->dataEnd);

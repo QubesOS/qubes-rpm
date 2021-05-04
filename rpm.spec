@@ -86,7 +86,12 @@ Patch919: 0010-Force-GCC-to-behave-as-RPM-expects.patch
 Patch920: 0011-Remove-useless-variable.patch
 Patch921: 0012-Require-package-headers-to-be-more-than-a-region.patch
 Patch922: 0013-Top-level-signatures-must-stand-alone.patch
-Patch923: 0014-RPM_NULL_TYPE-is-not-a-valid-type.patch
+Patch923: 0014-Fix-RPM_MIN_TYPE-definition-RPM_NULL_TYPE-is-not-a-l.patch
+Patch924: 0015-Rip-out-DSA-support.patch
+Patch925: 0016-Fix-OpenPGP-parsing-bugs.patch
+Patch926: 0017-Header-signatures-alone-are-not-sufficient.patch
+Patch927: 0018-Simplify-the-OpenSSL-backend.patch
+Patch928: 0019-Avoid-double-frees-if-EVP_PKEY_assign_RSA-fails.patch
 
 # Partially GPL/LGPL dual-licensed and some bits with BSD
 # SourceLicense: (GPLv2+ and LGPLv2+ with exceptions) and BSD 

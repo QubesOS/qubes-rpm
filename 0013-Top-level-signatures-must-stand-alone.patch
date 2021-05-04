@@ -1,7 +1,7 @@
-From 0935e27959afc2f4bb651eda7485306bec7778ba Mon Sep 17 00:00:00 2001
+From 7e681ec2f31fdfe706f4505fc4ef2444510a97d1 Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Fri, 2 Apr 2021 22:17:09 -0400
-Subject: [PATCH 13/17] Top-level signatures must stand alone
+Subject: [PATCH 13/22] Top-level signatures must stand alone
 
 It makes no sense for a top-level signature to be more than one packet,
 and allowing it increases attack surface significantly.

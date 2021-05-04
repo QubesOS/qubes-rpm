@@ -1,7 +1,7 @@
-From 10c92b935ee82f90c620ccc179a12eee42cabc1e Mon Sep 17 00:00:00 2001
+From a3d45e79c3784e401bb244dc6043008aedbe97c0 Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Tue, 23 Mar 2021 11:42:19 -0400
-Subject: [PATCH 04/17] Avoid integer overflow computing blob->ril
+Subject: [PATCH 04/22] Avoid integer overflow computing blob->ril
 
 This is upstream c3e04c2ac91737b06ce5592e8cd8558498e566c0 and
 1efe530450b5bdbd90128327be56c87fa1b6843b.
@@ -10,7 +10,7 @@ This is upstream c3e04c2ac91737b06ce5592e8cd8558498e566c0 and
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/lib/header.c b/lib/header.c
-index 697af43..0a6f08b 100644
+index 697af43..fc44070 100644
 --- a/lib/header.c
 +++ b/lib/header.c
 @@ -1852,8 +1852,6 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
@@ -27,10 +27,10 @@ index 697af43..0a6f08b 100644
      }
  
 +    /*
-+     * Trailer offset is negative and has a special meaning.  Negate *after*
-+     * division to prevent overflow.  Watch out for precedence!
++     * Trailer offset is negative and has a special meaning.
++     * Watch out for overflow!
 +     */
-+    blob->ril = -(einfo.offset/sizeof(*blob->pe));
++    blob->ril = einfo.offset/-(int32_t)sizeof(*blob->pe);
      /* Does the region actually fit within the header? */
 -    blob->ril = einfo.offset/sizeof(*blob->pe);
      if ((einfo.offset % sizeof(*blob->pe)) || hdrchkRange(blob->il, blob->ril) ||

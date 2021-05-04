@@ -1,7 +1,7 @@
 From fe12839de37b040228fd327e1be22dc8d244c4bb Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Tue, 23 Mar 2021 11:38:07 -0400
-Subject: [PATCH 03/17] Avoid calling memchr() on a past-the-end pointer
+Subject: [PATCH 03/22] Avoid calling memchr() on a past-the-end pointer
 
 This is upstream 165330b7bf0757e30fa8a6de9998a564fb62796f and
 34f28c1492240c0a02b0abb13af7f1870197e41d.

@@ -1,15 +1,15 @@
-From e65a001c5348a7ae507ffe5b6f7f4892c24f9700 Mon Sep 17 00:00:00 2001
+From 02e8bd7c17899a4469c7aca34801fa3208ae0ab8 Mon Sep 17 00:00:00 2001
 From: Demi Marie Obenour <demi@invisiblethingslab.com>
 Date: Fri, 2 Apr 2021 22:12:09 -0400
-Subject: [PATCH 11/17] Remove useless variable
+Subject: [PATCH 11/22] Remove useless variable
 
 regionEnd did not need to be a separate variable.
 ---
- lib/header.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ lib/header.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/lib/header.c b/lib/header.c
-index b547096..dc8e40e 100644
+index 9fc8f4d..d1d37ff 100644
 --- a/lib/header.c
 +++ b/lib/header.c
 @@ -1812,7 +1812,6 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
@@ -20,13 +20,18 @@ index b547096..dc8e40e 100644
  
      /* Check that we have at least on tag */
      if (blob->il < 1) {
-@@ -1856,9 +1855,7 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
+@@ -1853,13 +1852,10 @@ static rpmRC hdrblobVerifyRegion(rpmTagVal regionTag, int exact_size,
+ 		einfo.tag, einfo.type, einfo.offset, einfo.count);
+ 	goto exit;
+     }
++    blob->rdl = einfo.offset + REGION_TAG_COUNT;
  
      /* Is there an immutable header region tag trailer? */
-     memset(&trailer, 0, sizeof(trailer));
+-    memset(&trailer, 0, sizeof(trailer));
 -    regionEnd = blob->dataStart + einfo.offset;
 -    (void) memcpy(&trailer, regionEnd, REGION_TAG_COUNT);
 -    regionEnd += REGION_TAG_COUNT;
+-    blob->rdl = regionEnd - blob->dataStart;
 +    memcpy(&trailer, blob->dataStart + einfo.offset, REGION_TAG_COUNT);
  
      ei2h(&trailer, &einfo);

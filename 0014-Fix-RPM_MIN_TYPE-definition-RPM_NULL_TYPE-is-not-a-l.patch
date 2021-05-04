@@ -1,0 +1,51 @@
+From 04388feca0ed3d467c9f73174df37971cfcc0ba9 Mon Sep 17 00:00:00 2001
+From: Panu Matilainen <pmatilai@redhat.com>
+Date: Mon, 5 Apr 2021 14:03:06 -0400
+Subject: [PATCH 14/22] Fix RPM_MIN_TYPE definition, RPM_NULL_TYPE is not a
+ legit tag type
+
+RPM_NULL_TYPE is not a legit tag type, but RPM_MIN_TYPE is defined
+and used as if it was. Change RPM_MIN_TYPE to 1 to make the MIN-MAX
+range actually relevant, in particular for hdrchkType(). Also fix
+the lone user who in query code who clearly had encountered this very
+issue before but worked around locally...
+
+Reported and initial patch by Demi Marie Obenour.
+
+Modified-by: Demi Marie Obenour
+Upstream 42f53a13c4300c046f4f16d91712bb28763da4c3 and
+4f4b905dae57b98540ea9a75c2bf95effbd809f6.
+---
+ lib/query.c  | 2 +-
+ lib/rpmtag.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/query.c b/lib/query.c
+index 8c8299b..74dcb87 100644
+--- a/lib/query.c
++++ b/lib/query.c
+@@ -259,7 +259,7 @@ void rpmDisplayQueryTags(FILE * fp)
+ 	    rpmTagVal tag = rpmTagGetValue(sname);
+ 	    rpmTagType type = rpmTagGetTagType(tag);
+ 	    fprintf(fp, "%-20s %6d", sname, tag);
+-	    if (type > RPM_NULL_TYPE && type <= RPM_MAX_TYPE)
++	    if (type >= RPM_MIN_TYPE && type <= RPM_MAX_TYPE)
+ 		fprintf(fp, " %s", tagTypeNames[type]);
+ 	} else {
+ 	    fprintf(fp, "%s", sname);
+diff --git a/lib/rpmtag.h b/lib/rpmtag.h
+index 8c718b3..f70a187 100644
+--- a/lib/rpmtag.h
++++ b/lib/rpmtag.h
+@@ -429,7 +429,7 @@ typedef enum rpmSigTag_e {
+  * The basic types of data in tags from headers.
+  */
+ typedef enum rpmTagType_e {
+-#define	RPM_MIN_TYPE		0
++#define	RPM_MIN_TYPE		1
+     RPM_NULL_TYPE		=  0,
+     RPM_CHAR_TYPE		=  1,
+     RPM_INT8_TYPE		=  2,
+-- 
+2.30.2
+
