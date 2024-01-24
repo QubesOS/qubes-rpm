@@ -1,0 +1,5 @@
+librpmsign.so.9 librpmsign9 #MINVER#
+* Build-Depends-Package: librpm-dev
+ rpmPkgDelFileSign@Base 4.17.0+dfsg1
+ rpmPkgDelSign@Base 4.14.0+dfsg1
+ rpmPkgSign@Base 4.14.0+dfsg1

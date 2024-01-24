@@ -1,0 +1,28 @@
+Description: Fix installation directories
+ - Do not install rpm to /bin/.
+ - Setup default directories so that source RPMs rebuilt on Debian get
+   the right directories and also that builds occur in /usr/src/rpm
+ - Fix statedir and init.d patch
+Author: Michal Čihař <nijel@debian.org>
+--- a/macros.in
++++ b/macros.in
+@@ -911,7 +911,7 @@
+ %_datadir		%{_prefix}/share
+ %_sysconfdir		/etc
+ %_sharedstatedir	%{_prefix}/com
+-%_localstatedir		%{_prefix}/var
++%_localstatedir		@localstatedir@
+ %_lib			lib
+ %_libdir		%{_exec_prefix}/%{_lib}
+ %_includedir		%{_prefix}/include
+--- a/platform.in
++++ b/platform.in
+@@ -41,7 +41,7 @@
+ %_oldincludedir		@oldincludedir@
+ %_infodir		@infodir@
+ %_mandir		@mandir@
+-%_initddir		%{_sysconfdir}/rc.d/init.d
++%_initddir		%{_sysconfdir}/init.d
+ # Deprecated misspelling, present for backwards compatibility.
+ %_initrddir		%{_initddir}
+ %_rundir		@RUNDIR@

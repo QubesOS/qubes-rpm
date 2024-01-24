@@ -1,0 +1,15 @@
+Description: Verbose installplatform
+ Just make installplatform to ease debugging problems with creatin platform files.
+Author: Michal Čihař <nijel@debian.org>
+Last-Update: 2012-05-29
+
+--- a/installplatform
++++ b/installplatform
+@@ -217,6 +217,7 @@
+   | grep -v '^@' \
+   | ${FILTER} \
+   > ${PPD}/macros
++  echo "Created ${PPD}/macros"
+ 
+ done
+ 

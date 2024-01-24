@@ -1,0 +1,211 @@
+Source: rpm
+Maintainer: RPM packaging team <team+pkg-rpm@tracker.debian.org>
+Uploaders: Michal Čihař <nijel@debian.org>
+Section: admin
+Priority: optional
+Build-Depends: debhelper-compat (= 13),
+               binutils-dev,
+               bzip2,
+               debugedit (>= 1:5),
+               dh-sequence-python3,
+               dh-package-notes,
+               gnupg2 [linux-any],
+               libarchive-dev,
+               libaudit-dev [linux-any],
+               libbz2-dev,
+               libcap-dev [linux-any],
+               libdbus-1-dev,
+               libdw-dev,
+               libelf-dev,
+               libfsverity-dev [linux-any],
+               libgcrypt20-dev,
+               liblua5.3-dev,
+               liblzma-dev,
+               libmagic-dev,
+               libpopt-dev,
+               libreadline-dev,
+               libselinux1-dev [linux-any],
+               libsemanage-dev [linux-any],
+               libsepol-dev [linux-any],
+               libsqlite3-dev,
+               libxml2-dev,
+               libzstd-dev,
+               p7zip-full,
+               pandoc,
+               pkg-config,
+               python3-all-dev,
+               python3-utf8-locale <!nocheck>,
+               xz-utils,
+               zlib1g-dev,
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+Vcs-Browser: https://salsa.debian.org/pkg-rpm-team/rpm
+Vcs-Git: https://salsa.debian.org/pkg-rpm-team/rpm.git
+Homepage: https://rpm.org/
+
+Package: rpm
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         ${perl:Depends},
+         rpm2cpio,
+         debugedit (>= 1:5),
+         rpm-common (= ${binary:Version})
+Suggests: alien,
+          python3,
+          elfutils,
+          rpmlint,
+          rpm-i18n
+Description: package manager for RPM
+ The RPM Package Manager (RPM) is a command-line driven package
+ management system capable of installing, uninstalling, verifying,
+ querying, and updating computer software packages.
+ .
+ On Debian and derived systems it is recommended to use "alien" to
+ convert RPM packages into .deb format instead of bypassing the Debian
+ package management system by installing them directly with rpm.
+
+Package: rpm2cpio
+Architecture: any
+Multi-Arch: foreign
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         rpm-common (= ${binary:Version})
+Suggests: rpm-i18n
+Description: tool to convert RPM package to CPIO archive
+ The RPM Package Manager (RPM) is a command-line driven package
+ management system capable of installing, uninstalling, verifying,
+ querying, and updating computer software packages.
+ .
+ This package contains tool to convert RPM packages to standard CPIO
+ archive.
+
+Package: rpm-common
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Description: common files for RPM
+ The RPM Package Manager (RPM) is a command-line driven package
+ management system capable of installing, uninstalling, verifying,
+ querying, and updating computer software packages.
+ .
+ This package contains some scripts and default configuration which is
+ used by RPM libraries.
+
+Package: rpm-i18n
+Architecture: all
+Section: localization
+Depends: ${misc:Depends}
+Suggests: rpm
+Description: localization and localized man pages for rpm
+ The RPM Package Manager (RPM) is a command-line driven package
+ management system capable of installing, uninstalling, verifying,
+ querying, and updating computer software packages.
+ .
+ This package contains localization of rpm and localized man pages.
+
+Package: librpm9
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         librpmio9 (= ${binary:Version})
+Recommends: rpm-common (= ${binary:Version})
+Description: RPM shared library
+ The RPM Package Manager (RPM) is a command-line driven package
+ management system capable of installing, uninstalling, verifying,
+ querying, and updating computer software packages.
+ .
+ This library allows programs to make use of an RPM database or RPM packages
+ without going through the program rpm.
+
+Package: librpmio9
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Description: RPM IO shared library
+ The RPM Package Manager (RPM) is a command-line driven package
+ management system capable of installing, uninstalling, verifying,
+ querying, and updating computer software packages.
+ .
+ This library provides basic IO functionality which is used by librpm.
+
+Package: librpmbuild9
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         librpm9 (= ${binary:Version}),
+         librpmio9 (= ${binary:Version})
+Description: RPM build shared library
+ The RPM Package Manager (RPM) is a command-line driven package
+ management system capable of installing, uninstalling, verifying,
+ querying, and updating computer software packages.
+ .
+ This library provides an interface for building RPM packages.
+
+Package: librpmsign9
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         librpm9 (= ${binary:Version}),
+         librpmio9 (= ${binary:Version})
+Description: RPM signing shared library
+ The RPM Package Manager (RPM) is a command-line driven package
+ management system capable of installing, uninstalling, verifying,
+ querying, and updating computer software packages.
+ .
+ This library provides an interface for signing RPM packages.
+
+Package: librpm-dev
+Architecture: any
+Section: libdevel
+Depends: librpm9 (= ${binary:Version}),
+         librpmio9 (= ${binary:Version}),
+         librpmbuild9 (= ${binary:Version}),
+         librpmsign9 (= ${binary:Version}),
+         libpopt-dev,
+         libbz2-dev,
+         zlib1g-dev,
+         libxml2-dev,
+         libreadline-dev,
+         libzstd-dev,
+         libselinux1-dev [linux-any],
+         libsqlite3-dev,
+         libgcrypt20-dev,
+         libaudit-dev [linux-any],
+         libfsverity-dev [linux-any],
+         ${misc:Depends}
+Description: RPM shared library, development kit
+ The RPM Package Manager (RPM) is a command-line driven package
+ management system capable of installing, uninstalling, verifying,
+ querying, and updating computer software packages.
+ .
+ This package provides the development kit, containing static
+ libraries and header files necessary to build programs that use
+ librpm.
+
+Package: python3-rpm
+Architecture: any
+Section: python
+Depends: ${misc:Depends},
+         ${shlibs:Depends},
+         ${python3:Depends},
+         librpm9 (= ${binary:Version}),
+         librpmio9 (= ${binary:Version}),
+         librpmbuild9 (= ${binary:Version}),
+         librpmsign9 (= ${binary:Version}),
+         rpm-common (= ${binary:Version})
+Breaks: ${python3:Breaks}
+Provides: ${python3:Provides}
+Description: Python 3 bindings for RPM
+ The RPM Package Manager (RPM) is a command-line driven package
+ management system capable of installing, uninstalling, verifying,
+ querying, and updating computer software packages.
+ .
+ This package includes the Python bindings for librpm, allowing Python
+ scripts to manipulate RPM packages and the RPM database.
+ .
+ This package installs the library for Python 3.

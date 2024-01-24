@@ -1,0 +1,4 @@
+usr/bin/rpm2cpio
+usr/bin/rpm2archive
+usr/share/man/man8/rpm2cpio*
+

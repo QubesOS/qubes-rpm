@@ -1,0 +1,30 @@
+rpm (4.17.0+dfsg1-1) unstable; urgency=medium
+
+  INCOMPATIBLE CHANGE! Read BEFORE upgrading!
+
+  The rpm package has DROPPED support for the Berkeley DB database format!
+  The new rpm package (4.17 or higher) will NOT be able to access
+  the information about the packages installed by earlier rpm versions!
+
+  If you have used the "rpm" command to install any packages, you must
+  run `rpmdb --exportdb > rpm.data` BEFORE performing this upgrade and
+  then `rpmdb --importdb < rpm.data` after the upgrade is complete.
+
+ -- Peter Pentchev <roam@debian.org>  Sat, 20 Nov 2021 23:45:50 +0200
+
+rpm (4.8.0-4) experimental; urgency=low
+
+  The rpm default configuration no longer uses system package database. For
+  each user, own database in ~/.rpmdb will be created. This avoids errors while
+  running rpm as user, what is anyway most common use case on Debian.
+
+ -- Michal Čihař <nijel@debian.org>  Thu, 22 Apr 2010 09:48:55 +0200
+
+rpm (4.7.0-9) unstable; urgency=low
+
+  rpm package now creates database on installation. If you did use rpm for
+  installing any packages, please refer to README.Debian how to recover
+  the database.
+
+ -- Michal Čihař <nijel@debian.org>  Wed, 15 Jul 2009 22:33:54 +0200
+

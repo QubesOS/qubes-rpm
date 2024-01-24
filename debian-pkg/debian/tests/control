@@ -1,0 +1,4 @@
+Test-Command: env PYTHONPATH="$(pwd)/debian/tests/src" python3 -B -u -m rpmtest -b /usr/bin -d debian/tests/data
+Depends: @, fakeroot, file, make, python3-utf8-locale
+Features: test-name=rpmbuild
+Restrictions: allow-stderr

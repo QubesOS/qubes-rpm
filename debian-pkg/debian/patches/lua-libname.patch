@@ -1,0 +1,16 @@
+Description: In Debian, lua library is called lua5.3.
+Author: Michal Čihař <nijel@debian.org>
+Forwarded: http://rpm.org/ticket/88
+Last-Update: 2023-01-05
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -785,7 +785,7 @@
+ AM_CONDITIONAL(ACL,[test "$with_acl" = yes])
+ 
+ PKG_CHECK_MODULES([LUA],
+-    [lua >= 5.2],
++    [lua5.3 >= 5.2],
+     [],
+     [AC_MSG_ERROR([lua not present or too old)])])
+ AC_SUBST(LUA_CFLAGS)

@@ -1,0 +1,26 @@
+Description: Move default rpmdb path to user home
+ We don't want to use system database, because we don't want users to install
+ rpm packages on Debian.
+ .
+ [benh: Use bash for the expansion, as dash will never look up in the
+ passwd file]
+Bug-Debian: https://bugs.debian.org/551669
+Bug-Debian: https://bugs.debian.org/741324
+Bug-Ubuntu: https://bugs.launchpad.net/bugs/530023
+Bug-Ubuntu: https://bugs.launchpad.net/bugs/1069350
+Author: Michal Čihař <nijel@debian.org>
+Last-Update: 2014-03-22
+
+--- a/macros.in
++++ b/macros.in
+@@ -119,7 +119,9 @@
+ %_buildshell		/bin/sh
+ 
+ #	The location of the rpm database file(s).
+-%_dbpath		%{_var}/lib/rpm
++#	We want to lookup the home dir in the passwd file if necessary,
++#	which requires bash.
++%_dbpath		%(bash -c 'echo ~/.rpmdb')
+ 
+ #	The location of the rpm database file(s) after "rpm --rebuilddb".
+ %_dbpath_rebuild	%{_dbpath}

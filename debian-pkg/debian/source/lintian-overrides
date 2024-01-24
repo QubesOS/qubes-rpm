@@ -1,0 +1,3 @@
+rpm source: source-is-missing [tests/data/misc/helloexe]
+rpm source: source-is-missing [tests/data/misc/hellopie]
+rpm source: source-is-missing [tests/data/misc/libhello.so]

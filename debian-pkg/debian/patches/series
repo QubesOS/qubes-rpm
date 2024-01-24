@@ -1,0 +1,10 @@
+installplatform-verbose.patch
+rpmdb-in-home.patch
+debian-disable-rpm.patch
+fix-directories.patch
+tempfile.patch
+autogen-cleanup.patch
+lua-libname.patch
+rpm-4.10.90-rpmlib-filesystem-check.patch
+usr-bin.patch
+python-rpm-packaging.patch

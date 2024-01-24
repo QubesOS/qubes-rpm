@@ -1,0 +1,20 @@
+Description: Use the correct full path to some commands.
+ Even though it does not matter on usrmerged systems,
+ some programs are not found in /bin, but in /usr/bin instead.
+Forwarded: no
+Author: Peter Pentchev <roam@ringlet.net>
+Last-Update: 2021-11-17
+
+--- a/scripts/rpm.daily
++++ b/scripts/rpm.daily
+@@ -1,8 +1,8 @@
+ #!/bin/sh
+ 
+ tmpfile=`/bin/mktemp /var/log/rpmpkgs.XXXXXXXXX` || exit 1
+-/bin/rpm -qa --qf '%{name}-%{version}-%{release}.%{arch}.rpm\n' 2>&1 \
+-	| /bin/sort > "$tmpfile"
++/usr/bin/rpm -qa --qf '%{name}-%{version}-%{release}.%{arch}.rpm\n' 2>&1 \
++	| /usr/bin/sort > "$tmpfile"
+ 
+ if [ ! -s "$tmpfile" ]; then
+ 	rm -f "$tmpfile"

@@ -1,0 +1,97 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Uncomment this to turn on verbose mode.
+# export DH_VERBOSE=1
+
+# For DEB_HOST_ARCH_OS
+include /usr/share/dpkg/architecture.mk
+
+# For proper pkg-config
+DPKG_EXPORT_BUILDTOOLS = 1
+include /usr/share/dpkg/buildtools.mk
+
+DEB_BUILD_MAINT_OPTIONS = hardening=+all
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+
+include /usr/share/debhelper/dh_package_notes/package-notes.mk
+
+ifeq (linux,$(DEB_HOST_ARCH_OS))
+       configure_flags +=--with-cap --with-selinux --with-fsverity
+endif
+
+configure_flags += \
+	--datadir=/usr/share \
+	--with-external-db \
+	--with-lua \
+	--with-debian \
+	--with-vendor=debian \
+	--enable-shared \
+	--enable-python \
+	--enable-bdb-ro \
+	CPPFLAGS="$(CPPFLAGS)"
+
+configure_paths += \
+	AWK=/usr/bin/awk \
+	__BZIP2=/bin/bzip2 \
+	__CAT=/bin/cat \
+	__CHMOD=/bin/chmod \
+	__CHOWN=/bin/chown \
+	__CP=/bin/cp \
+	__CURL=/usr/bin/curl \
+	__FILE=/usr/bin/file \
+	FILECMD=/usr/bin/file \
+	__GPG=/usr/bin/gpg2 \
+	__GREP=/bin/grep \
+	__GZIP=/bin/gzip \
+	__UNZIP=/usr/bin/unzip \
+	__ID=/usr/bin/id \
+	__INSTALL=/usr/bin/install \
+	__LRZIP=/usr/bin/lrzip \
+	__LZIP=/usr/bin/lzip \
+	__XZ=/usr/bin/xz \
+	__GEM=/usr/bin/gem \
+	__MAKE=/usr/bin/make \
+	__MKDIR=/bin/mkdir \
+	MKDIR_P='/bin/mkdir -p' \
+	__MV=/bin/mv \
+	__PATCH=/usr/bin/patch \
+	__PERL=/usr/bin/perl \
+	__PGP=/usr/bin/pgp \
+	__PYTHON=/usr/bin/python \
+	__RM=/bin/rm \
+	__SED=/bin/sed \
+	__TAR=/bin/tar \
+	__ZSTD=/usr/bin/zstd \
+	__LD=/usr/bin/ld \
+	__OBJDUMP=/usr/bin/objdump \
+	__STRIP=/usr/bin/strip \
+	__FIND_DEBUGINFO=/usr/bin/find-debuginfo \
+	__GIT=/usr/bin/git \
+	__HG=/usr/bin/hg \
+	__BZR=/usr/bin/bzr \
+	__QUILT=/usr/bin/quilt
+
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(configure_paths) $(configure_flags)
+	cd python && ln -s ../debian
+
+execute_after_dh_auto_build:
+	cd python && dh_auto_build --buildsystem=pybuild
+
+execute_after_dh_auto_install:
+	# Remove Python, we use distutils built modules
+	rm -rf python/rpm.egg-info debian/tmp/usr/lib/python*
+	cd python && dh_auto_install --buildsystem=pybuild
+	# Kill all the junk this installs.
+	rm -f debian/tmp/usr/lib/rpm/config.guess \
+		debian/tmp/usr/lib/rpm/config.sub \
+		debian/tmp/usr/lib/*/*.la \
+		debian/tmp/usr/lib/*/rpm-plugins/*.la \
+		debian/tmp/usr/lib/rpm/rpm.log
+	# Fix permissions
+	chmod +x debian/tmp/usr/lib/rpm/rpm.daily
+
+%:
+	dh $@

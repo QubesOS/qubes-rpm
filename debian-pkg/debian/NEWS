@@ -1,0 +1,9 @@
+rpm (4.11.2-2) unstable; urgency=low
+
+  Since 4.11.2 rpm is more strict about using - in version or release
+  name. The version in Debian is patched to emit only warning on this,
+  but this patch will disappear in future releases, so please adjust
+  your spec files accordingly. The same approach was taken by Fedora 20,
+  so we try to stay compatible with upstream by this.
+
+ -- Michal Čihař <nijel@debian.org>  Thu, 27 Feb 2014 13:35:35 +0100

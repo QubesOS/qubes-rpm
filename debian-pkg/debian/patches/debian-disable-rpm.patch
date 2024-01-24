@@ -1,0 +1,59 @@
+Description: RPM is not default package manager on Debian
+ In Debian, rpm should be used to install packages, but rather as a tool to
+ work with rpm packages or as a helper in alien. Because of this we protect
+ complain, when user tries to install a package. This warning can be hidden 
+ by --force-debian.
+Author: Michal Čihař <nijel@debian.org>
+Forwarded: http://rpm.org/ticket/79
+--- a/configure.ac
++++ b/configure.ac
+@@ -633,6 +633,8 @@
+ 
+ AM_CONDITIONAL(ENABLE_PYTHON,[test "$WITH_PYTHON_SUBPACKAGE" = 1])
+ 
++AC_ARG_WITH(debian, [  --with-debian		build rpm for usage on Debian],[AC_DEFINE(ON_DEBIAN, 1, [Define as 1 if you do not want to use rpm for installing packages])])
++
+ AC_PATH_PROG(DOXYGEN, doxygen, no)
+ AC_CHECK_PROG(HAVE_DOT,[dot],[YES],[NO])
+ AC_PATH_PROG(PANDOC, pandoc, no)
+--- a/lib/poptI.c
++++ b/lib/poptI.c
+@@ -150,6 +150,11 @@
+ 
+  { "force", '\0', 0, NULL, RPMCLI_POPT_FORCE,
+ 	N_("short hand for --replacepkgs --replacefiles"), NULL},
++#if defined(ON_DEBIAN)
++ { "force-debian", '\0', POPT_BIT_SET, &rpmIArgs.probFilter,
++	(RPMPROB_FILTER_DEBIAN),
++	N_("force installation of rpm on Debian system"), NULL},
++#endif
+ 
+  { "freshen", 'F', POPT_BIT_SET, &rpmIArgs.installInterfaceFlags,
+ 	(INSTALL_UPGRADE|INSTALL_FRESHEN|INSTALL_INSTALL),
+--- a/rpm.c
++++ b/rpm.c
+@@ -125,6 +125,14 @@
+ 	    bigMode = MODE_RESTORE;
+     }
+ 
++#if defined(ON_DEBIAN)
++    if ((bigMode == MODE_INSTALL || bigMode == MODE_ERASE) &&
++        (ia->probFilter & RPMPROB_FILTER_DEBIAN) == 0) {
++        fprintf(stderr, _("%s: %s\n"), __progname, _("RPM should not be used directly install RPM packages, use Alien instead!"));
++        fprintf(stderr, _("%s: %s\n"), __progname, _("However assuming you know what you are doing..."));
++    }
++#endif
++
+     if (!( bigMode == MODE_INSTALL ) &&
+ (ia->probFilter & (RPMPROB_FILTER_REPLACEPKG | RPMPROB_FILTER_OLDPACKAGE)))
+ 	argerror(_("only installation and upgrading may be forced"));
+--- a/include/rpm/rpmprob.h
++++ b/include/rpm/rpmprob.h
+@@ -30,6 +30,7 @@
+     RPMPROB_FILTER_DISKSPACE	= (1 << 7),	/*!< from --ignoresize */
+     RPMPROB_FILTER_DISKNODES	= (1 << 8),	/*!< from --ignoresize */
+     RPMPROB_FILTER_VERIFY	= (1 << 9),	/*!< from --noverify */
++    RPMPROB_FILTER_DEBIAN	= (1 << 10),	/*!< from --force-debian */
+ };
+ 
+ typedef rpmFlags rpmprobFilterFlags;
